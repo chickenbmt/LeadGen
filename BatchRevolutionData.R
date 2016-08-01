@@ -107,6 +107,7 @@ data.detail[3:length(data.detail)] = data.detail[3:length(data.detail)]/data.det
 
 data.detail[1:(nrow(data.detail)-1),3:length(data.detail)] = data.detail.list[[2]][-nrow(data.detail.list[[2]]),3:length(data.detail.list[[2]])] - 
               data.detail.list[[1]][,3:length(data.detail.list[[1]])]
+data.detail =data.detail[order(data.detail$BatchSentDate,decreasing = T),]
 row.names(data.detail) = data.detail[,1]
 data.detail = data.detail[,-(1:2)]
 rm(data.detail.list)
@@ -121,7 +122,11 @@ data.ne.compare$`%Delta(last2days)` = round(data.ne.compare$`Delta(last2days)`/d
 data.aging = as.data.frame(matrix(0,ncol=0,nrow=7))
 data.aging[,1] = c("1 day", "2 days", "3 days", "4 days", "5 days", "6-10 days", ">10 days")
 a = excel.batch.append[excel.batch.append$ReportDate%in%colnames(data.acc)[(length(data.acc)-1):length(data.acc)],
-                       c("BatchSentDate","ReportDate","Follow 1st time","Follow 2nd time","Follow 3rd time","Processing & Meeting")]
+                       c("BatchSentDate","ReportDate","Follow 1st time","Follow 2nd time","Follow 3rd time","Processing & Meeting","APP")]
+colnames(a)[6] = "Processing & Meeting (not converted)"
+a$cal = ifelse(sign(a[,6]-a[,7])!=-1,a[,6]-a[,7],0)
+a$`Processing & Meeting (not converted)` = a$cal
+a = a[,-c(7,8)]
 data.list = split(a,a$ReportDate)
 rm(a)
 
